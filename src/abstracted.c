@@ -1,26 +1,7 @@
 /*
-
-   Big Time watch
-
-   A digital watch with large digits.
-
-
-   A few things complicate the implementation of this watch:
-
-   a) The largest size of the Nevis font which the Pebble handles
-      seems to be ~47 units (points or pixels?). But the size of
-      characters we want is ~100 points.
-
-      This requires us to generate and use images instead of
-      fonts--which complicates things greatly.
-
-   b) When I started it wasn't possible to load all the images into
-      RAM at once--this means we have to load/unload each image when
-      we need it. The images are slightly smaller now than they were
-      but I figured it would still be pushing it to load them all ataa
-      once, even if they just fit, so I've stuck with the load/unload
-      approach.
-
+	Abstracted
+		by Kevin Weber
+			8/12/2013
  */
 
 #include "pebble_os.h"
@@ -57,11 +38,12 @@ GPoint loc( unsigned short x, unsigned short y ){
 	return GPoint( x, y );
 }
 
-/*GSize scale( unsigned short x, unsigned short y){
+/*
+GSize scale( unsigned short x, unsigned short y){
 	return GSize( x, y );
-}*/
+}
 
-/*GRect area( GPoint corner, GSize otherCorner ){
+GRect area( GPoint corner, GSize otherCorner ){
 	return GRect( corner, otherCorner );
 }*/
 
@@ -73,16 +55,20 @@ GPoint loc( unsigned short x, unsigned short y ){
 	
 void draw_face( unsigned short count_m, unsigned short count_h, bool isPM, AppContextRef ctx )
 {
+	// Set Drawing Colors
+	graphics_context_set_fill_color(ctx, GColorBlack);
+	graphics_context_set_stroke_color(ctx, GColorBlack);
+	
 	// Draw Static Block
-	for( unsigned short b=0; b<73; b++ ){
-		void graphics_draw_line( ctx, loc( 144-b, 0 ), loc( 144, b ) );
+	for( unsigned short b=0; b<72; b++ ){
+		graphics_draw_line( ctx, loc( 144-b, 0 ), loc( 144, b ) );
 	}
 	
 	// Draw PM Shade
 	if( isPM )
 	{
 		for( unsigned short p=1; p<PM_SIZE+1; p++ ){
-			void graphics_draw_line( ctx, loc( p*2, 168 ), loc( 144, 168 - p*2 ) );
+			graphics_draw_line( ctx, loc( p*2, 168 ), loc( 144, 168 - p*2 ) );
 			//line( width, height - i*2, 0, width + height - i*2 );
 		}
 	}
@@ -97,7 +83,7 @@ void draw_face( unsigned short count_m, unsigned short count_h, bool isPM, AppCo
 								
 						   0, GCornerNone );*/
 		for( unsigned short i=0; i<=HOUR_BAR_HEIGHT; i++ ){
-			void graphics_draw_line( ctx, loc( 0, HOUR_BAR_HEIGHT + (h*HOUR_BAR_HEIGHT*2) + i ), loc( 144, HOUR_BAR_HEIGHT*2 + (h*HOUR_BAR_HEIGHT*2) + i ) );
+			graphics_draw_line( ctx, loc( 0, HOUR_BAR_HEIGHT + (h*HOUR_BAR_HEIGHT*2) + i ), loc( 144, HOUR_BAR_HEIGHT*2 + (h*HOUR_BAR_HEIGHT*2) + i ) );
 		}
 	}
 	
@@ -105,7 +91,7 @@ void draw_face( unsigned short count_m, unsigned short count_h, bool isPM, AppCo
 	for( unsigned short m=0; m<count_m; m++ )
 	{
 		unsigned short y_pos_left = 168 - MINUTE_SPACING*(m+1);
-		void graphics_draw_line( ctx, loc( 0, y_pos_left ), loc( 144, y_pos_left+144 ) );
+		graphics_draw_line( ctx, loc( 0, y_pos_left ), loc( 144, y_pos_left+144 ) );
 		//line( 0, 168 - minute_spacing*(m+1), 144, 168 - minute_spacing*(m+1) + 144 );
 	}
 }
@@ -138,7 +124,7 @@ void handle_init(AppContextRef ctx) {
 
   window_init(&window, "Abstracted");
   window_stack_push(&window, true);
-  window_set_background_color(&window, GColorBlack);
+  window_set_background_color(&window, GColorWhite);
 
   resource_init_current_app(&APP_RESOURCES);
 
