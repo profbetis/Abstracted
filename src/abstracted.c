@@ -6,26 +6,22 @@
 
 #include "pebble_os.h"
 #include "pebble_app.h"
-#include "pebble_fonts.h"
-
-#include "resource_ids.auto.h"
+//#include "pebble_fonts.h"
 
 #define MY_UUID { 0x74, 0x30, 0xBC, 0xF6, 0x1C, 0xED, 0x48, 0xA7, 0x8E, 0x23, 0xD4, 0x96, 0x79, 0x52, 0xC1, 0xF8 }
 PBL_APP_INFO(MY_UUID,
              "Abstracted", "Kevin Weber",
-             0, 1, /* App version */
+             0, 4, /* App version */
              DEFAULT_MENU_ICON, /* Change this for watchface icon?? */
              APP_INFO_WATCH_FACE);
 
 Window window;
+Layer abst;
+
+PblTm Ctime;
 
 
 
-
-unsigned short get_display_hour(unsigned short hour) {
-	unsigned short display_hour = hour % 12;
-	return display_hour;
-}
 
 bool get_pm( unsigned short hour )
 {
@@ -59,6 +55,12 @@ void draw_face( unsigned short count_m, unsigned short count_h, bool isPM, AppCo
 	graphics_context_set_fill_color(ctx, GColorBlack);
 	graphics_context_set_stroke_color(ctx, GColorBlack);
 	
+	graphics_draw_pixel( ctx, loc( 20, 20 ) );
+	graphics_draw_pixel( ctx, loc( 21, 20 ) );
+	graphics_draw_pixel( ctx, loc( 22, 20 ) );
+	graphics_draw_pixel( ctx, loc( 23, 21 ) );
+	graphics_draw_pixel( ctx, loc( 24, 22 ) );
+	
 	// Draw Static Block
 	for( unsigned short b=0; b<72; b++ ){
 		graphics_draw_line( ctx, loc( 144-b, 0 ), loc( 144, b ) );
@@ -83,7 +85,7 @@ void draw_face( unsigned short count_m, unsigned short count_h, bool isPM, AppCo
 								
 						   0, GCornerNone );*/
 		for( unsigned short i=0; i<=HOUR_BAR_HEIGHT; i++ ){
-			graphics_draw_line( ctx, loc( 0, HOUR_BAR_HEIGHT + (h*HOUR_BAR_HEIGHT*2) + i ), loc( 144, HOUR_BAR_HEIGHT*2 + (h*HOUR_BAR_HEIGHT*2) + i ) );
+			graphics_draw_line( ctx, loc( 0, HOUR_BAR_HEIGHT + (h*HOUR_BAR_HEIGHT*2) + i ), loc( 144, HOUR_BAR_HEIGHT + (h*HOUR_BAR_HEIGHT*2) + i ) );
 		}
 	}
 	
@@ -96,26 +98,25 @@ void draw_face( unsigned short count_m, unsigned short count_h, bool isPM, AppCo
 	}
 }
 
-//void display_value(unsigned short value, unsigned short row_number, bool show_first_leading_zero) { }
 
-void display_time(PblTm *tick_time, AppContextRef ctx )
+void abst_update_callback(Layer *me, GContext* ctx )
 {
-	draw_face( tick_time->tm_min, 
-			get_display_hour(tick_time->tm_hour), 
-			get_pm(tick_time->tm_hour), 
-			ctx );
+	(void)me;
+	PblTm Ctime;
+	get_time( &Ctime );
 	
-  //display_value(get_display_hour(tick_time->tm_hour), 0, false);
-  //display_value(tick_time->tm_min, 1, true);
+	draw_face( Ctime.tm_min, 
+			Ctime.tm_hour%12, 
+			Ctime.tm_hour<12 ? false : true, 
+			ctx );
 }
-
 
 
 void handle_minute_tick(AppContextRef ctx, PebbleTickEvent *t) {
   (void)t;
-  //(void)ctx;
-
-  display_time(t->tick_time, ctx);
+  (void)ctx;
+  layer_mark_dirty(&abst);
+  //display_time(t->tick_time, ctx);
 }
 
 
@@ -126,13 +127,11 @@ void handle_init(AppContextRef ctx) {
   window_stack_push(&window, true);
   window_set_background_color(&window, GColorWhite);
 
-  resource_init_current_app(&APP_RESOURCES);
+  layer_init(&abst, window.layer.frame);
+  abst.update_proc = abst_update_callback; // Pointer problem here
+  layer_add_child(&window.layer, &abst);
 
-  // Avoids a blank screen on watch start.
-  PblTm tick_time;
-
-  get_time(&tick_time);
-  display_time(&tick_time, ctx);
+  handle_minute_tick(ctx, NULL);
 }
 
 
@@ -152,5 +151,6 @@ void pbl_main(void *params) {
     }
 
   };
+
   app_event_loop(params, &handlers);
 }
