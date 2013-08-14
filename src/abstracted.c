@@ -11,7 +11,7 @@
 #define MY_UUID { 0x74, 0x30, 0xBC, 0xF6, 0x1C, 0xED, 0x48, 0xA7, 0x8E, 0x23, 0xD4, 0x96, 0x79, 0x52, 0xC1, 0xF8 }
 PBL_APP_INFO(MY_UUID,
              "Abstracted", "Kevin Weber",
-             0, 4, /* App version */
+             1, 0, /* App version */
              DEFAULT_MENU_ICON, /* Change this for watchface icon?? */
              APP_INFO_WATCH_FACE);
 
@@ -34,8 +34,8 @@ GPoint loc( unsigned short x, unsigned short y ){
 	return GPoint( x, y );
 }
 
-/*
-GSize scale( unsigned short x, unsigned short y){
+
+/*GSize scale( unsigned short x, unsigned short y){
 	return GSize( x, y );
 }
 
@@ -45,7 +45,7 @@ GRect area( GPoint corner, GSize otherCorner ){
 
 
 
-#define HOUR_BAR_HEIGHT 6
+#define HOUR_BAR_HEIGHT 7
 #define MINUTE_SPACING 4
 #define PM_SIZE 72
 	
@@ -55,12 +55,6 @@ void draw_face( unsigned short count_m, unsigned short count_h, bool isPM, AppCo
 	graphics_context_set_fill_color(ctx, GColorBlack);
 	graphics_context_set_stroke_color(ctx, GColorBlack);
 	
-	graphics_draw_pixel( ctx, loc( 20, 20 ) );
-	graphics_draw_pixel( ctx, loc( 21, 20 ) );
-	graphics_draw_pixel( ctx, loc( 22, 20 ) );
-	graphics_draw_pixel( ctx, loc( 23, 21 ) );
-	graphics_draw_pixel( ctx, loc( 24, 22 ) );
-	
 	// Draw Static Block
 	for( unsigned short b=0; b<72; b++ ){
 		graphics_draw_line( ctx, loc( 144-b, 0 ), loc( 144, b ) );
@@ -69,8 +63,8 @@ void draw_face( unsigned short count_m, unsigned short count_h, bool isPM, AppCo
 	// Draw PM Shade
 	if( isPM )
 	{
-		for( unsigned short p=1; p<PM_SIZE+1; p++ ){
-			graphics_draw_line( ctx, loc( p*2, 168 ), loc( 144, 168 - p*2 ) );
+		for( unsigned short p=0; p<PM_SIZE+1; p++ ){
+			graphics_draw_line( ctx, loc( p*2, 168 ), loc( 144, 24 + p*2 ) );
 			//line( width, height - i*2, 0, width + height - i*2 );
 		}
 	}
@@ -78,12 +72,12 @@ void draw_face( unsigned short count_m, unsigned short count_h, bool isPM, AppCo
 	// Draw Hour Rectangles
 	for( unsigned short h=0; h<count_h; h++){
 		//rect( 0, h*barHeight*2 + startHeight, width, h*barHeight*2 + barHeight + startHeight );
-		/*void graphics_fill_rect( ctx, 
-								
-						   area( loc( 0, HOUR_BAR_HEIGHT + (h*HOUR_BAR_HEIGHT*2) ),
-						   	    scale( 144, HOUR_BAR_HEIGHT ) ), 
-								
-						   0, GCornerNone );*/
+		/*graphics_fill_rect( ctx, 
+					   area( loc( 0, HOUR_BAR_HEIGHT + (h*HOUR_BAR_HEIGHT*2) ),
+					   scale( 144, HOUR_BAR_HEIGHT ) ), 
+					   0, GCornerNone );*/
+		
+		
 		for( unsigned short i=0; i<=HOUR_BAR_HEIGHT; i++ ){
 			graphics_draw_line( ctx, loc( 0, HOUR_BAR_HEIGHT + (h*HOUR_BAR_HEIGHT*2) + i ), loc( 144, HOUR_BAR_HEIGHT + (h*HOUR_BAR_HEIGHT*2) + i ) );
 		}
@@ -94,6 +88,8 @@ void draw_face( unsigned short count_m, unsigned short count_h, bool isPM, AppCo
 	{
 		unsigned short y_pos_left = 168 - MINUTE_SPACING*(m+1);
 		graphics_draw_line( ctx, loc( 0, y_pos_left ), loc( 144, y_pos_left+144 ) );
+		//graphics_draw_line( ctx, loc( 0, y_pos_left-1 ), loc( 144, y_pos_left+145 ) );
+		
 		//line( 0, 168 - minute_spacing*(m+1), 144, 168 - minute_spacing*(m+1) + 144 );
 	}
 }
