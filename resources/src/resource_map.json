@@ -1,6 +1,16 @@
 {
     "media": [
         {
+            "defName": "LARGE_PIXEL_FONT",
+            "type": "png",
+            "file": "images/digits_10px.png"
+        },
+        {
+            "defName": "SMALL_PIXEL_FONT",
+            "type": "png",
+            "file": "images/digits_5px.png"
+        },
+        {
             "defName": "IMAGE_MENU_ICON",
             "type": "png",
             "file": "images/menu_icon_big_watch.png"
